@@ -3,10 +3,6 @@ from email import message_from_file
 from sys import stdin
 
 
-def extract_text(msg):
-    return msg.get_payload()
-
-
 def get_payload(msg):
     """
     Get the payload from the Message.
