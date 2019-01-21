@@ -28,7 +28,7 @@ def get_message_body(fp):
     @return a string containing the message body
     """
     msg = message_from_file(fp)
-    return(get_payload(msg))
+    return get_payload(msg)
 
 
 def main():
