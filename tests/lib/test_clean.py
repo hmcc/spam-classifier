@@ -1,4 +1,4 @@
-from clean import EmailCleaner
+from lib.clean import EmailCleaner
 
 
 class TestEmailCleaner:

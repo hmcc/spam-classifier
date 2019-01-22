@@ -1,4 +1,4 @@
-from split import EmailTokenizer
+from lib.split import EmailTokenizer
 
 
 class TestEmailTokenizer:
