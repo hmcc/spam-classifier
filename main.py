@@ -1,19 +1,47 @@
 from argparse import ArgumentParser
+from errno import EEXIST
+from os import makedirs
+from os.path import dirname, exists
+from lib.preprocess import tokenize
+from lib.lexicon import build
 
 
-def build_lexicon(spams, hams):
-    parser = ArgumentParser(description='Process some integers.')
-    parser.add_argument('integers', metavar='N', type=int, nargs='+',
-                    help='an integer for the accumulator')
-    parser.add_argument('--sum', dest='accumulate', action='store_const',
-                    const=sum, default=max,
-                    help='sum the integers (default: find the max)')
+def save_lexicon(lexicon, lexicon_output):
+    if lexicon_output:
+        if not exists(dirname(lexicon_output)):
+            try:
+                makedirs(dirname(lexicon_output))
+            except OSError as exc:      # Guard against race condition
+                if exc.errno != EEXIST:
+                    raise
+
+        with open(lexicon_output, 'w') as fp:
+            for word in lexicon:
+                fp.write('{}\n'.format(word))
+
 
 def main():
     """
-    Extract an email message body from stdin and print the result to stdout.
+    Build a lexicon of words found in spam and non-spam emails.
     """
-    pass
+    parser = ArgumentParser(description='Classify spam and non-spam emails.')
+    parser.add_argument('spam_dir', metavar='S', help='directory containing spam messages')
+    parser.add_argument('ham_dir', metavar='H', help='directory containing non-spam messages')
+    parser.add_argument('--count', dest='size', default=100, help='minimum word count to include in lexicon')
+    parser.add_argument(
+        '--lexicon-only', action='store_true', dest='lexicon_only', default=False, help='stop after building lexicon'
+    )
+    parser.add_argument('--lexicon-output', dest='lexicon_output', default=None, help='save lexicon to a file')
+    parser.add_argument(
+        '--lexicon-size', dest='lexicon_size', default=100, help='minimum word count to include in lexicon'
+    )
+    args = parser.parse_args()
+
+    processed_emails = tokenize(args.spam_dir, args.ham_dir)
+    lexicon = build(processed_emails.values(), args.size)
+    save_lexicon(lexicon, args.lexicon_output)
+    if args.lexicon_only:
+        return
 
 
 if __name__ == "__main__":

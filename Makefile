@@ -6,7 +6,7 @@ install-test: requirements-test.txt install
 	python3 -m nltk.downloader punkt
 
 lexicon: install
-	python3 lib/lexicon.py data/text/spam/ data/text/ham/
+	python3 main.py data/text/spam/ data/text/ham/ --lexicon-only --lexicon-output data/lexicon.txt
 
 test: install-test
 	python3 -m pytest tests
