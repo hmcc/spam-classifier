@@ -19,7 +19,7 @@ class LexiconBuilder():
         return [k for k, v in self.lexicon.items() if v >= wordcount]
 
 
-def build(processed_emails, size=100):
+def build_lexicon(processed_emails, size=100):
     lexicon = LexiconBuilder()
     pbar = tqdm(processed_emails)
     pbar.set_description('Building lexicon')
@@ -27,3 +27,19 @@ def build(processed_emails, size=100):
         lexicon.add_all(processed_email.tokens)
 
     return lexicon.get(size)
+
+
+def extract_features_for_one(words, lexicon):
+    indices = [lexicon.index(word) for word in words if word in lexicon]
+    features = [0] * len(lexicon)
+    for i in indices:
+        features[i] = 1
+    return features
+
+
+def extract_features(processed_emails, lexicon):
+    features = []
+    pbar = tqdm(processed_emails)
+    pbar.set_description('Extracting features')
+    for processed_email in tqdm(processed_emails):
+        features.append(extract_features_for_one(processed_email.tokens, lexicon))

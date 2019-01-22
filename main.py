@@ -2,8 +2,8 @@ from argparse import ArgumentParser
 from errno import EEXIST
 from os import makedirs
 from os.path import dirname, exists
+from lib.features import build_lexicon, extract_features
 from lib.preprocess import tokenize
-from lib.lexicon import build
 
 
 def save_lexicon(lexicon, lexicon_output):
@@ -38,10 +38,12 @@ def main():
     args = parser.parse_args()
 
     processed_emails = tokenize(args.spam_dir, args.ham_dir)
-    lexicon = build(processed_emails.values(), args.size)
+    lexicon = build_lexicon(processed_emails, args.size)
     save_lexicon(lexicon, args.lexicon_output)
     if args.lexicon_only:
         return
+
+    features = extract_features(processed_emails, lexicon)
 
 
 if __name__ == "__main__":

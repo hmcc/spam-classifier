@@ -95,7 +95,7 @@ def tokenize(spam_dir, ham_dir):
         return [join(directory, f) for f in listdir(directory) if isfile(join(directory, f))]
 
     cleaner = EmailCleaner()
-    processed = {}
+    processed = []
     tokenizer = EmailTokenizer()
     all_files = list_files(spam_dir) + list_files(ham_dir)
     file_count = len(all_files)
@@ -107,7 +107,7 @@ def tokenize(spam_dir, ham_dir):
         with open(file, encoding='ISO-8859-1') as fp:
             cleaned = cleaner.replace(fp.read())
             tokens = tokenizer.run(cleaned)
-            processed[identifier] = ProcessedEmail(identifier, spam, tokens)
+            processed.append(ProcessedEmail(identifier, spam, tokens))
         pbar.update(1)
 
     return processed
