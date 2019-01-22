@@ -8,7 +8,7 @@ install-test: requirements-test.txt install
 lexicon: install
 	python3 main.py data/text/spam/ data/text/ham/ --lexicon-only --lexicon-output data/lexicon.txt
 
-train: install
+test: install
 	python3 main.py data/text/spam/ data/text/ham/
 
 unit-test: install-test

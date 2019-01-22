@@ -1,3 +1,6 @@
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
 from tqdm import tqdm
 
 
@@ -17,6 +20,19 @@ class LexiconBuilder():
         if not wordcount:
             return list(self.lexicon.keys())
         return [k for k, v in self.lexicon.items() if v >= wordcount]
+
+
+class SVMClassifier():
+
+    def train(self, X, y, kernel, C):
+        self.model = SVC(kernel=kernel)
+        self.model.fit(X, y)
+        return self
+
+    def predict(self, X):
+        if not hasattr(self, 'model'):
+            raise('First call train()')
+        return self.model.predict(X)
 
 
 def build_lexicon(processed_emails, size=100):
@@ -43,3 +59,16 @@ def extract_features(processed_emails, lexicon):
     pbar.set_description('Extracting features')
     for processed_email in tqdm(processed_emails):
         features.append(extract_features_for_one(processed_email.tokens, lexicon))
+    return features
+
+
+def train_and_test(X, y, test_size, kernel, C, quiet=False):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
+    if not quiet:
+        print('Training SVM...')
+    classifier = SVMClassifier().train(X_train, y_train, kernel, C)
+    y_pred = classifier.predict(X_test)
+    if not quiet:
+        print('Done.')
+    print(confusion_matrix(y_test, y_pred))
+    print(classification_report(y_test, y_pred))

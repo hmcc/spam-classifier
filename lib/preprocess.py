@@ -68,13 +68,13 @@ class EmailTokenizer:
     def run(self, text):
         tokens = self.tokenize(text)
         if tokens:
-            tokens = (sub('[^A-Za-z0-9]+', '', word) for word in tokens)
-            tokens = (word for word in tokens if word)
+            tokens = [sub('[^A-Za-z0-9]+', '', word) for word in tokens]
+            tokens = [word for word in tokens if word]
         return self.stem(tokens)
 
     def stem(self, tokens):
         if tokens:
-            return (self.stemmer.stem(t) for t in tokens)
+            return [self.stemmer.stem(t) for t in tokens]
         return tokens
 
     def tokenize(self, text):
@@ -103,7 +103,7 @@ def tokenize(spam_dir, ham_dir):
     pbar.set_description('Tokenizing emails')
     for file in all_files:
         identifier = basename(file)
-        spam = dirname(file) == spam_dir
+        spam = dirname(file) in spam_dir
         with open(file, encoding='ISO-8859-1') as fp:
             cleaned = cleaner.replace(fp.read())
             tokens = tokenizer.run(cleaned)
@@ -120,7 +120,9 @@ def main():
     """
     body = stdin.read()
     parser = ArgumentParser(description='Classify spam and non-spam emails.')
-    parser.add_argument('--clean-only', action='store_true', dest='clean_only', default=False, help='stop after cleaning')
+    parser.add_argument(
+        '--clean-only', action='store_true', dest='clean_only', default=False, help='stop after cleaning'
+    )
     args = parser.parse_args()
 
     print(body)

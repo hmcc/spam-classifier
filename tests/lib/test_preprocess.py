@@ -75,7 +75,7 @@ class TestEmailTokenizer:
         assert self.tokenizer.run(None) is None
 
     def test_run_blank(self):
-        assert list(self.tokenizer.run('')) == []
+        assert self.tokenizer.run('') == ''
 
     def test_run_valid(self):
         body = (
@@ -96,4 +96,4 @@ class TestEmailTokenizer:
             'mail list send an email to emailaddr'
         )
         tokenized = self.tokenizer.run(body)
-        assert ' '.join(list(tokenized)) == expected
+        assert ' '.join(tokenized) == expected
