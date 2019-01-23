@@ -62,8 +62,11 @@ def extract_features(processed_emails, lexicon):
     return features
 
 
-def train_and_test(X, y, test_size, kernel, C, quiet=False):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
+def split(*arrays, test_size):
+    return train_test_split(*arrays, test_size=test_size)
+
+
+def train_and_test(X_train, X_test, y_train, y_test, kernel, C, quiet=False):
     if not quiet:
         print('Training SVM...')
     classifier = SVMClassifier().train(X_train, y_train, kernel, C)

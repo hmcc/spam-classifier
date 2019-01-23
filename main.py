@@ -3,7 +3,7 @@ from errno import EEXIST
 from os import makedirs
 from os.path import dirname, exists
 
-from lib.ml import build_lexicon, extract_features, train_and_test
+from lib.ml import build_lexicon, extract_features, split, train_and_test
 from lib.preprocess import tokenize
 
 
@@ -61,15 +61,17 @@ def main():
     args = parser.parse_args()
 
     processed_emails = tokenize(args.spam_dir, args.ham_dir)
-    lexicon = build_lexicon(processed_emails, args.lexicon_word_count)
+    train_emails, unused = split(processed_emails, test_size=args.test_size)
+    lexicon = build_lexicon(train_emails, args.lexicon_word_count)
     save_lexicon(lexicon, args.lexicon_output)
     if args.lexicon_only:
         return
 
     X = extract_features(processed_emails, lexicon)
     y = [1 if processed_email.spam else 0 for processed_email in processed_emails]
+    X_train, X_test, y_train, y_test = split(X, y, test_size=args.test_size)
 
-    train_and_test(X, y, args.test_size, args.kernel, args.C)
+    train_and_test(X_train, X_test, y_train, y_test, args.kernel, args.C)
 
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ make test
 I wrote this to consolidate my own learning, and there's plenty more to do!
 For example:
 
-* lists are used throughout rather than generators/tuples, for simplicity
+* lists are used in many places where tuples/generators probably should be
 * regexes for emails, money etc are not robust (apart from the excellent
 [URL regex from John Gruber](https://daringfireball.net/2010/07/improved_regex_for_matching_urls)
 * unit test coverage is patchy
@@ -43,8 +43,8 @@ Despite these limitations, it works surprisingly well; using the `20021010_spam`
 ```
               precision    recall  f1-score   support
 
-           0       0.99      0.98      0.98       286
-           1       0.95      0.96      0.95        95
+           0       0.99      0.98      0.99       280
+           1       0.95      0.98      0.97       101
 ```
 
 ## What's next?

@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from html.parser import HTMLParser
+from itertools import chain, cycle, islice
 from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import word_tokenize
 from os import listdir
@@ -90,18 +91,35 @@ class ProcessedEmail:
         self.tokens = tokens
 
 
+def roundrobin(*iterables):
+    """
+    roundrobin('ABC', 'D', 'EF') --> A D E B F C
+    From https://docs.python.org/3/library/itertools.html#itertools-recipes
+    Recipe credited to George Sakkis
+    """
+    num_active = len(iterables)
+    nexts = cycle(iter(it).__next__ for it in iterables)
+    while num_active:
+        try:
+            for next in nexts:
+                yield next()
+        except StopIteration:
+            # Remove the iterator we just exhausted from the cycle.
+            num_active -= 1
+            nexts = cycle(islice(nexts, num_active))
+
+
 def tokenize(spam_dir, ham_dir):
     def list_files(directory):
-        return [join(directory, f) for f in listdir(directory) if isfile(join(directory, f))]
+        return tuple(join(directory, f) for f in listdir(directory) if isfile(join(directory, f)))
 
     cleaner = EmailCleaner()
     processed = []
     tokenizer = EmailTokenizer()
-    all_files = list_files(spam_dir) + list_files(ham_dir)
-    file_count = len(all_files)
+    file_count = len(list_files(spam_dir) + list_files(ham_dir))
     pbar = tqdm(total=file_count)
     pbar.set_description('Tokenizing emails')
-    for file in all_files:
+    for file in roundrobin(list_files(spam_dir), list_files(ham_dir)):
         identifier = basename(file)
         spam = dirname(file) in spam_dir
         with open(file, encoding='ISO-8859-1') as fp:
